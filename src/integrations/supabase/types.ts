@@ -38,8 +38,51 @@ export type Database = {
         }
         Relationships: []
       }
+      fish_inventory_items: {
+        Row: {
+          caught_at: string
+          id: string
+          mutation_key: string
+          species_id: string
+          wallet_address: string
+          weight_kg: number
+        }
+        Insert: {
+          caught_at?: string
+          id?: string
+          mutation_key?: string
+          species_id: string
+          wallet_address: string
+          weight_kg: number
+        }
+        Update: {
+          caught_at?: string
+          id?: string
+          mutation_key?: string
+          species_id?: string
+          wallet_address?: string
+          weight_kg?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fish_inventory_items_mutation_key_fkey"
+            columns: ["mutation_key"]
+            isOneToOne: false
+            referencedRelation: "mutations"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "fish_inventory_items_species_id_fkey"
+            columns: ["species_id"]
+            isOneToOne: false
+            referencedRelation: "fish_species"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fish_species: {
         Row: {
+          base_price_per_kg: number
           color: string
           created_at: string
           id: string
@@ -51,6 +94,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          base_price_per_kg?: number
           color: string
           created_at?: string
           id: string
@@ -62,6 +106,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          base_price_per_kg?: number
           color?: string
           created_at?: string
           id?: string
@@ -103,9 +148,37 @@ export type Database = {
         }
         Relationships: []
       }
+      mutations: {
+        Row: {
+          created_at: string
+          drop_weight: number
+          key: string
+          label: string
+          multiplier: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          drop_weight: number
+          key: string
+          label: string
+          multiplier: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          drop_weight?: number
+          key?: string
+          label?: string
+          multiplier?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
+          coins: number
           created_at: string
           display_name: string
           fish_common: number
@@ -120,6 +193,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          coins?: number
           created_at?: string
           display_name?: string
           fish_common?: number
@@ -134,6 +208,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          coins?: number
           created_at?: string
           display_name?: string
           fish_common?: number
@@ -250,6 +325,66 @@ export type Database = {
         Args: { _rarity: string; _wallet: string }
         Returns: {
           avatar_url: string | null
+          coins: number
+          created_at: string
+          display_name: string
+          fish_common: number
+          fish_epic: number
+          fish_legendary: number
+          fish_mythic: number
+          fish_rare: number
+          level: number
+          updated_at: string
+          username: string
+          wallet_address: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      record_catch: {
+        Args: {
+          _mutation_key: string
+          _rarity: string
+          _species_id: string
+          _wallet: string
+          _weight_kg: number
+        }
+        Returns: {
+          avatar_url: string | null
+          coins: number
+          created_at: string
+          display_name: string
+          fish_common: number
+          fish_epic: number
+          fish_legendary: number
+          fish_mythic: number
+          fish_rare: number
+          level: number
+          updated_at: string
+          username: string
+          wallet_address: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      sell_fish: {
+        Args: {
+          _item_id: string
+          _sell_all: boolean
+          _species_id: string
+          _wallet: string
+        }
+        Returns: {
+          avatar_url: string | null
+          coins: number
           created_at: string
           display_name: string
           fish_common: number
