@@ -103,6 +103,36 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string
+          level: number
+          updated_at: string
+          username: string
+          wallet_address: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          level?: number
+          updated_at?: string
+          username: string
+          wallet_address: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          level?: number
+          updated_at?: string
+          username?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
       rarity_base_weights: {
         Row: {
           base_weight: number
