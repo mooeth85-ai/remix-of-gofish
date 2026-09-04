@@ -147,29 +147,12 @@ export const recordCatch = createServerFn({ method: "POST" })
     const wallet = await verifyProof(data.proof);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const column = `fish_${data.rarity}` as const;
-
-    const current = await supabaseAdmin
-      .from("profiles")
-      .select("*")
-      .eq("wallet_address", wallet)
-      .maybeSingle();
-    if (current.error) throw new Error(current.error.message);
-    if (!current.data) return null;
-
-    const patch = { [column]: (current.data[column] ?? 0) + 1 } as {
-      fish_common?: number;
-      fish_rare?: number;
-      fish_epic?: number;
-      fish_legendary?: number;
-      fish_mythic?: number;
-    };
-    const updated = await supabaseAdmin
-      .from("profiles")
-      .update(patch)
-      .eq("wallet_address", wallet)
-      .select("*")
-      .single();
+    // Atomic increment handled by the increment_fish_catch Postgres function
+    // (single UPDATE ... SET col = col + 1, no read-modify-write race).
+    const updated = await supabaseAdmin.rpc("increment_fish_catch", {
+      _wallet: wallet,
+      _rarity: data.rarity,
+    });
     if (updated.error) throw new Error(updated.error.message);
     return updated.data;
   });

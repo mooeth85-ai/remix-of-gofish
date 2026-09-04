@@ -452,7 +452,7 @@ export function Angler() {
           st.splashT = 0;
           st.splashAt.copy(st.bobber);
           setPhase("waiting");
-          setMessage("Menunggu ikan menyambar...");
+          setMessage("Waiting for a bite...");
           playBobberSplash(1);
         }
       } else {
