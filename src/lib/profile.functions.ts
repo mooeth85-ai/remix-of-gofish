@@ -134,3 +134,41 @@ export const uploadAvatar = createServerFn({ method: "POST" })
 
     return { path };
   });
+
+const recordCatchSchema = z.object({
+  proof: proofSchema,
+  rarity: z.enum(["common", "rare", "epic", "legendary", "mythic"]),
+});
+
+/** Increments the fish_{rarity} counter on the caller's profile. */
+export const recordCatch = createServerFn({ method: "POST" })
+  .validator((input: unknown) => recordCatchSchema.parse(input))
+  .handler(async ({ data }) => {
+    const wallet = await verifyProof(data.proof);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const column = `fish_${data.rarity}` as
+      | "fish_common"
+      | "fish_rare"
+      | "fish_epic"
+      | "fish_legendary"
+      | "fish_mythic";
+
+    const current = await supabaseAdmin
+      .from("profiles")
+      .select(column)
+      .eq("wallet_address", wallet)
+      .maybeSingle();
+    if (current.error) throw new Error(current.error.message);
+    if (!current.data) return null;
+
+    const next = (current.data[column] ?? 0) + 1;
+    const updated = await supabaseAdmin
+      .from("profiles")
+      .update({ [column]: next })
+      .eq("wallet_address", wallet)
+      .select("*")
+      .single();
+    if (updated.error) throw new Error(updated.error.message);
+    return updated.data;
+  });
