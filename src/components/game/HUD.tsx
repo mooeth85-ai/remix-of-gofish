@@ -1,10 +1,18 @@
-import { Moon, Sun, Sunrise, Sunset } from "lucide-react";
+import {
+  Clock,
+  Cloud,
+  CloudFog,
+  CloudLightning,
+  CloudRain,
+  Moon,
+  Sun,
+  Sunrise,
+  Sunset,
+} from "lucide-react";
 import { useGameStore } from "@/hooks/useGameStore";
 import { useWeather, WEATHER, type WeatherKind } from "@/hooks/useWeather";
 import { useDayNight, dayLabelFor, type DayLabel } from "@/hooks/useDayNight";
 import type { Rarity } from "@/lib/fishRules";
-
-const WEATHER_KINDS = Object.keys(WEATHER) as WeatherKind[];
 
 const DAY_ICON = {
   Dawn: Sunrise,
@@ -12,6 +20,24 @@ const DAY_ICON = {
   Dusk: Sunset,
   Night: Moon,
 } satisfies Record<DayLabel, typeof Sun>;
+
+const WEATHER_ICON: Record<WeatherKind, typeof Sun> = {
+  cerah: Sun,
+  berawan: Cloud,
+  berkabut: CloudFog,
+  hujan: CloudRain,
+  badai: CloudLightning,
+};
+
+/** 12-hour clock label, e.g. "11:07 PM". */
+function formatClock(hour: number) {
+  const h = Math.floor(((hour % 24) + 24) % 24);
+  const m = Math.floor((((hour % 1) + 1) % 1) * 60);
+  const suffix = h < 12 ? "AM" : "PM";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:${String(m).padStart(2, "0")} ${suffix}`;
+}
+
 
 
 const RARITY_BADGE: Record<Rarity, string> = {
