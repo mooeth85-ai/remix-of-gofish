@@ -42,8 +42,8 @@ export function Merchant() {
 
     const g = group.current;
     if (!g) return;
-    if (settle.current < 5) {
-      settle.current += state.clock.getDelta ? 1 / 60 : 1 / 60;
+    if (settle.current < 300) {
+      settle.current += 1;
       y.current = groundHeight(x, z);
     }
     // gentle idle bob + face the player when they come close
