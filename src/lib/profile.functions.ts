@@ -192,10 +192,12 @@ export const sellFish = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const wallet = await verifyProof(data.proof);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // The generated arg types are non-nullable, but the SQL function treats
+    // NULL as "not filtering by this key".
     const res = await supabaseAdmin.rpc("sell_fish", {
       _wallet: wallet,
-      _item_id: data.itemId ?? null,
-      _species_id: data.speciesId ?? null,
+      _item_id: (data.itemId ?? null) as string,
+      _species_id: (data.speciesId ?? null) as string,
       _sell_all: data.sellAll ?? false,
     });
     if (res.error) throw new Error(res.error.message);
