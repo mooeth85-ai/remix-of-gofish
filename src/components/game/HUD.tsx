@@ -1,8 +1,19 @@
 import { useGameStore } from "@/hooks/useGameStore";
+import type { Rarity } from "@/lib/fishRules";
+
+const RARITY_BADGE: Record<Rarity, string> = {
+  common: "border-slate-400/40 bg-slate-400/20 text-slate-100",
+  rare: "border-sky-400/50 bg-sky-500/20 text-sky-100",
+  epic: "border-violet-400/50 bg-violet-500/20 text-violet-100",
+  legendary: "border-orange-400/50 bg-orange-500/20 text-orange-100",
+  mythic: "border-amber-300/60 bg-gradient-to-r from-amber-500/30 to-red-500/30 text-amber-100",
+};
 
 export function HUD() {
   const { phase, message, score, totalWeight, last } = useGameStore();
   const bite = phase === "bite";
+  const rarity = (last?.isMonster ? "mythic" : last?.rarity) as Rarity | undefined;
+
 
   return (
     <div className="pointer-events-none fixed inset-0 z-10 select-none">
