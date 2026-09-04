@@ -488,7 +488,7 @@ export function Angler() {
       armL = -1.2;
       armLZ = -0.55;
 
-      if (st.t > 1.6) {
+      if (st.t > biteWindowFor(useWeather.getState().kind)) {
         st.phase = "idle";
         st.t = 0;
         st.fish = null;
