@@ -100,9 +100,11 @@ export const useGameStore = create<GameStore>((set) => ({
   setMessage: (message) => set({ message }),
   setRodStowed: (rodStowed) => set({ rodStowed }),
   toggleRodStowed: () => set((s) => ({ rodStowed: !s.rodStowed })),
-  landFish: (f) =>
+  landFish: (f) => {
+    syncCatchToProfile(f);
     set((s) => ({
       score: s.score + 1,
+
       totalWeight: Number((s.totalWeight + f.weight).toFixed(2)),
       last: f,
     })),
