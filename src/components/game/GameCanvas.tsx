@@ -15,6 +15,8 @@ import { LoadingScreen } from "./LoadingScreen";
 import { Weather } from "./Weather";
 import { RainImpacts } from "./RainImpacts";
 import { WEATHER, useWeather } from "@/hooks/useWeather";
+import { useFishData } from "@/hooks/useFishData";
+
 import { player } from "@/hooks/usePlayer";
 import { resumeWeatherAudio } from "@/lib/weatherAudio";
 import { WalletButton } from "../wallet/WalletButton";
