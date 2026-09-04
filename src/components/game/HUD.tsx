@@ -39,6 +39,14 @@ export function HUD() {
               <p className="text-[11px] uppercase tracking-widest text-slate-300/80">Latest</p>
               <p className="text-sm font-semibold">{last.name}</p>
               <p className="text-xs text-slate-200/80">{last.weight} kg</p>
+              {rarity && (
+                <span
+                  className={`mt-1 inline-block rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${RARITY_BADGE[rarity]}`}
+                >
+                  {rarity}
+                </span>
+              )}
+
             </div>
           )}
         </div>
