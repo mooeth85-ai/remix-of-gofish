@@ -222,7 +222,29 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_fish_catch: {
+        Args: { _rarity: string; _wallet: string }
+        Returns: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string
+          fish_common: number
+          fish_epic: number
+          fish_legendary: number
+          fish_mythic: number
+          fish_rare: number
+          level: number
+          updated_at: string
+          username: string
+          wallet_address: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       [_ in never]: never
