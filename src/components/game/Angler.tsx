@@ -8,6 +8,9 @@ import { MonsterBurstMesh, animateBurst } from "./MonsterBurst";
 import { rollFish, useGameStore, type FishCatch } from "@/hooks/useGameStore";
 import { clampToWalkable, isInWater, player, resolvePlayerGround } from "@/hooks/usePlayer";
 import { boat } from "@/hooks/useBoat";
+import { useWeather } from "@/hooks/useWeather";
+import { biteWindowFor } from "@/lib/fishRules";
+
 import {
   playBobberSplash,
   playCastWhizz,
