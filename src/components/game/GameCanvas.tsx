@@ -14,7 +14,9 @@ import { HUD } from "./HUD";
 import { LoadingScreen } from "./LoadingScreen";
 import { Weather } from "./Weather";
 import { RainImpacts } from "./RainImpacts";
+import { WeatherCycleController } from "./WeatherCycleController";
 import { WEATHER, useWeather } from "@/hooks/useWeather";
+import { useDayNight, dayNightAt, TINT_WEIGHT } from "@/hooks/useDayNight";
 import { useFishData } from "@/hooks/useFishData";
 
 import { player } from "@/hooks/usePlayer";
