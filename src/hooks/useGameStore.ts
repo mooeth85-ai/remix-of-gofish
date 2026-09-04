@@ -72,6 +72,25 @@ export function rollFish(weatherKind = "cerah"): FishCatch {
   return toCatch(pick);
 }
 
+/** Fire-and-forget profile counter sync. Never blocks or breaks gameplay. */
+function syncCatchToProfile(f: FishCatch) {
+  const rarity: Rarity = f.isMonster ? "mythic" : ((f.rarity ?? "common") as Rarity);
+  void (async () => {
+    try {
+      const { useProfileStore } = await import("@/hooks/useProfileStore");
+      const proof = useProfileStore.getState().proof;
+      if (!proof) return;
+      const { recordCatch } = await import("@/lib/profile.functions");
+      const profile = await recordCatch({ data: { proof, rarity } });
+      if (profile) useProfileStore.getState().setProfile(profile);
+    } catch {
+      /* offline or not signed in — gameplay continues regardless */
+    }
+  })();
+}
+
+
+
 
 
 interface GameStore {
