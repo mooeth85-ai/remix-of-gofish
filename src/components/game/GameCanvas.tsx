@@ -51,6 +51,8 @@ export function GameCanvas() {
   const controls = useRef<OrbitControlsImpl>(null);
   const kind = useWeather((s) => s.kind);
   const backdrop = WEATHER[kind].backdrop;
+  useFishData();
+
 
   // Browsers may suspend WebAudio after focus/background transitions. Resume
   // on every relevant gesture, in capture phase so gameplay handlers always
