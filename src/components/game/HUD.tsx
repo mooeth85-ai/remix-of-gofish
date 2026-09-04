@@ -86,15 +86,38 @@ export function HUD() {
         </p>
       </div>
 
-      {/* Dev weather switcher — temporary until the automatic day/weather cycle lands */}
+      {/* Time of day */}
+      <div className="absolute left-4 top-24 flex items-center gap-2 rounded-full border border-white/25 bg-slate-900/45 px-3 py-1.5 text-slate-50 shadow-lg backdrop-blur-md">
+        <DayIcon size={14} />
+        <span className="text-[11px] font-semibold uppercase tracking-widest">{dayLabel}</span>
+        <span className="text-[11px] tabular-nums text-slate-300/80">
+          {String(Math.floor(hour)).padStart(2, "0")}:
+          {String(Math.floor((hour % 1) * 60)).padStart(2, "0")}
+        </span>
+      </div>
+
       <div className="pointer-events-auto absolute bottom-4 left-4 flex flex-col gap-1 rounded-2xl border border-white/25 bg-slate-900/45 p-2 shadow-lg backdrop-blur-md">
-        <p className="px-1 text-[10px] uppercase tracking-widest text-slate-300/80">Weather (dev)</p>
+        <p className="px-1 text-[10px] uppercase tracking-widest text-slate-300/80">Weather</p>
         <div className="flex gap-1">
+          <button
+            type="button"
+            onClick={() => useDayNight.getState().setAuto(!auto)}
+            className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold transition-colors ${
+              auto
+                ? "border-emerald-300/70 bg-emerald-500/30 text-emerald-100"
+                : "border-white/20 bg-slate-800/40 text-slate-400 hover:bg-slate-700/50"
+            }`}
+          >
+            Auto
+          </button>
           {WEATHER_KINDS.map((k) => (
             <button
               key={k}
               type="button"
-              onClick={() => useWeather.getState().setKind(k)}
+              onClick={() => {
+                useDayNight.getState().setAuto(false);
+                useWeather.getState().setKind(k);
+              }}
               className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold transition-colors ${
                 weatherKind === k
                   ? "border-sky-300/70 bg-sky-500/30 text-sky-100"
@@ -106,6 +129,7 @@ export function HUD() {
           ))}
         </div>
       </div>
+
     </div>
   );
 }
