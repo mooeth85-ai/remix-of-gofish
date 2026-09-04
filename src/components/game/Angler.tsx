@@ -471,7 +471,7 @@ export function Angler() {
       if (st.t > st.biteAt) {
         st.phase = "bite";
         st.t = 0;
-        st.fish = rollFish();
+        st.fish = rollFish(useWeather.getState().kind);
         setPhase("bite");
         setMessage("FISH ON! Press SPACE / ENTER now!");
       }
