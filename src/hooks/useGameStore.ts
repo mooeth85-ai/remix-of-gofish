@@ -69,10 +69,9 @@ export function rollFish(weatherKind = "cerah"): FishCatch {
     }
   }
 
-  const chosen = pick;
-  const weight = Math.min(rollWeight(chosen), cap === Infinity ? Number.POSITIVE_INFINITY : Math.max(cap, chosen.min_weight_kg));
-  return { ...toCatch(chosen), weight: Number(weight.toFixed(2)) };
+  return toCatch(pick);
 }
+
 
 
 interface GameStore {
