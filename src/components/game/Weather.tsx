@@ -3,6 +3,7 @@ import { Sky } from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { WEATHER, useWeather, type WeatherPreset } from "@/hooks/useWeather";
+import { clock, dayNightAt, TINT_WEIGHT } from "@/hooks/useDayNight";
 import { playThunder, setWeatherAmbience, setWeatherLevels } from "@/lib/weatherAudio";
 
 const damp = (cur: number, to: number, k: number, dt: number) =>
