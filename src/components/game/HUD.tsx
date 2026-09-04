@@ -1,8 +1,18 @@
+import { Moon, Sun, Sunrise, Sunset } from "lucide-react";
 import { useGameStore } from "@/hooks/useGameStore";
 import { useWeather, WEATHER, type WeatherKind } from "@/hooks/useWeather";
+import { useDayNight, dayLabelFor, type DayLabel } from "@/hooks/useDayNight";
 import type { Rarity } from "@/lib/fishRules";
 
 const WEATHER_KINDS = Object.keys(WEATHER) as WeatherKind[];
+
+const DAY_ICON = {
+  Dawn: Sunrise,
+  Day: Sun,
+  Dusk: Sunset,
+  Night: Moon,
+} satisfies Record<DayLabel, typeof Sun>;
+
 
 const RARITY_BADGE: Record<Rarity, string> = {
   common: "border-slate-400/40 bg-slate-400/20 text-slate-100",
