@@ -153,7 +153,7 @@ export function WalletButton() {
         <BalanceRow symbol="ETH" value={ethValue} logo="/logo-eth.png" />
         <BalanceRow symbol="USDG" value={displayBalance("0.00")} logo="/logo-usdg.png" />
         <BalanceRow symbol="GOLD" value={displayBalance(0)} logo={goldLogo} />
-        <BalanceRow symbol="COINS" value={displayBalance(0)} logo={coinsLogo} />
+        <BalanceRow symbol="COINS" value={displayBalance(Number(profile?.coins ?? 0).toLocaleString())} logo={coinsLogo} />
       </div>
     </div>
   );
