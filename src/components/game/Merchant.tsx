@@ -14,7 +14,10 @@ export function Merchant() {
   const [prompt, setPrompt] = useState(false);
   const open = useMerchant((s) => s.open);
   const [x, z] = MERCHANT_POS;
-  const y = groundHeight(x, z);
+  // The island colliders stream in after mount, so re-sample the ground for a
+  // few seconds instead of trusting the very first (water-level) reading.
+  const y = useRef(groundHeight(x, z));
+  const settle = useRef(0);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -39,15 +42,19 @@ export function Merchant() {
 
     const g = group.current;
     if (!g) return;
+    if (settle.current < 300) {
+      settle.current += 1;
+      y.current = groundHeight(x, z);
+    }
     // gentle idle bob + face the player when they come close
-    g.position.y = y + Math.sin(state.clock.elapsedTime * 1.6) * 0.03;
+    g.position.y = y.current + Math.sin(state.clock.elapsedTime * 1.6) * 0.03;
     if (near) {
       g.rotation.y = Math.atan2(player.pos.x - x, player.pos.z - z);
     }
   });
 
   return (
-    <group ref={group} position={[x, y, z]}>
+    <group ref={group} position={[x, y.current, z]}>
       {/* legs */}
       <mesh position={[-0.16, 0.42, 0]} castShadow>
         <capsuleGeometry args={[0.11, 0.6, 4, 8]} />

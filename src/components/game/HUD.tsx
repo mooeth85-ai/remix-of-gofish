@@ -72,7 +72,7 @@ export function HUD() {
       )}
       <div className="flex items-start justify-between p-4 sm:p-6">
         <div className="rounded-2xl border border-white/25 bg-slate-900/45 px-4 py-3 text-slate-50 shadow-lg backdrop-blur-md">
-          <h1 className="text-base font-semibold tracking-tight sm:text-lg">Fishing Island</h1>
+          <h1 className="text-base font-semibold tracking-tight sm:text-lg">Koleo Island</h1>
           <p className="mt-1 text-xs text-slate-200/80">
             Caught <span className="font-semibold text-slate-50">{score}</span> · Total{" "}
             <span className="font-semibold text-slate-50">{totalWeight} kg</span>
@@ -126,7 +126,7 @@ export function HUD() {
             {WEATHER[weatherKind].label}
           </span>
         </div>
-        <p className="text-2xl font-extrabold tracking-tight">Fishing Island</p>
+        <p className="text-2xl font-extrabold tracking-tight">Koleo Island</p>
         <div className="flex items-center gap-1.5 text-sm font-semibold">
           <Clock size={15} />
           <span className="tabular-nums">{formatClock(hour)}</span>
