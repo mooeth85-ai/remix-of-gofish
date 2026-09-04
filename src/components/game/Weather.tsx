@@ -284,8 +284,14 @@ function Atmosphere({ flash }: { flash: React.MutableRefObject<number> }) {
       (m.uniforms["rayleigh"]!.value as number) = s.rayleigh;
       (m.uniforms["mieCoefficient"]!.value as number) = s.mieCoefficient;
       // 1.0 is identity, so overcast/storm skies keep their natural gray.
+      s.skySaturation = damp(s.skySaturation, target.skySaturation, k, dt);
       const sat = m.uniforms["uSaturation"];
-      if (sat) (sat.value as number) = damp(sat.value as number, target.skySaturation, k, dt);
+      if (sat) (sat.value as number) = s.skySaturation * b;
+      // The dome itself is the night sky, so the tint applies at full weight.
+      const nightMix = m.uniforms["uNightMix"];
+      if (nightMix) (nightMix.value as number) = 1 - b;
+      const nightColor = m.uniforms["uNightColor"];
+      if (nightColor) (nightColor.value as THREE.Color).copy(day.tint);
     }
   });
 
