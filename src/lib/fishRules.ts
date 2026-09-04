@@ -37,6 +37,11 @@ export interface WeatherEffect {
   rarity_multiplier: RarityMultiplier;
 }
 
+export interface WeatherCycleConfig {
+  change_interval_seconds: number;
+  weights: Record<string, number>;
+}
+
 export interface FishData {
   species: FishSpecies[];
   rarityWeights: Record<string, number>;
@@ -44,6 +49,7 @@ export interface FishData {
   baits: BaitTier[];
   weather: Record<string, WeatherEffect>;
   config: Record<string, number>;
+  weatherCycle: WeatherCycleConfig;
 }
 
 /** Active gear. A future shop swaps these ids; the formula stays untouched. */
@@ -84,7 +90,11 @@ export const FALLBACK_FISH_DATA: FishData = {
     hujan: { weather_kind: "hujan", bite_window_seconds: 1.1, rarity_multiplier: { epic: 1.3, legendary: 1.5, mythic: 1.5 } },
     badai: { weather_kind: "badai", bite_window_seconds: 0.9, rarity_multiplier: { legendary: 1.8, mythic: 2.5 } },
   },
-  config: { monster_catch_chance: 0.02 },
+  config: { monster_catch_chance: 0.02, day_length_seconds: 720 },
+  weatherCycle: {
+    change_interval_seconds: 240,
+    weights: { cerah: 40, berawan: 25, berkabut: 15, hujan: 12, badai: 8 },
+  },
 };
 
 /** Module-level snapshot so the render loop can read rules synchronously. */

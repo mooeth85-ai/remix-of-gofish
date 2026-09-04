@@ -4,6 +4,7 @@ import type {
   FishData,
   FishSpecies,
   RodTier,
+  WeatherCycleConfig,
   WeatherEffect,
 } from "./fishRules";
 
@@ -27,16 +28,21 @@ export const getFishData = createServerFn({ method: "GET" }).handler(async (): P
     },
   });
 
-  const [species, rarity, rods, baits, weather, config] = await Promise.all([
+  const [species, rarity, rods, baits, weather, config, cycle] = await Promise.all([
     supabase.from("fish_species").select("id, name, color, rarity, min_weight_kg, max_weight_kg, is_monster"),
     supabase.from("rarity_base_weights").select("rarity, base_weight"),
     supabase.from("rod_tiers").select("id, name, max_catch_weight_kg"),
     supabase.from("bait_tiers").select("id, name, rarity_multiplier"),
     supabase.from("weather_effects").select("weather_kind, bite_window_seconds, rarity_multiplier"),
     supabase.from("game_config").select("key, value"),
+    supabase
+      .from("weather_cycle_config")
+      .select("change_interval_seconds, weights")
+      .eq("id", "default")
+      .maybeSingle(),
   ]);
 
-  const firstError = [species, rarity, rods, baits, weather, config].find((r) => r.error)?.error;
+  const firstError = [species, rarity, rods, baits, weather, config, cycle].find((r) => r.error)?.error;
   if (firstError) throw new Error(firstError.message);
 
   const rarityWeights: Record<string, number> = {};
@@ -75,5 +81,13 @@ export const getFishData = createServerFn({ method: "GET" }).handler(async (): P
     })),
     weather: weatherMap,
     config: cfg,
+    weatherCycle: {
+      change_interval_seconds: Number(
+        (cycle.data as WeatherCycleConfig | null)?.change_interval_seconds ?? 240,
+      ),
+      weights:
+        ((cycle.data as WeatherCycleConfig | null)?.weights as Record<string, number> | undefined) ??
+        { cerah: 40, berawan: 25, berkabut: 15, hujan: 12, badai: 8 },
+    },
   };
 });
