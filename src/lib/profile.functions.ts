@@ -147,28 +147,30 @@ export const recordCatch = createServerFn({ method: "POST" })
     const wallet = await verifyProof(data.proof);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const column = `fish_${data.rarity}` as
-      | "fish_common"
-      | "fish_rare"
-      | "fish_epic"
-      | "fish_legendary"
-      | "fish_mythic";
+    const column = `fish_${data.rarity}` as const;
 
     const current = await supabaseAdmin
       .from("profiles")
-      .select(column)
+      .select("*")
       .eq("wallet_address", wallet)
       .maybeSingle();
     if (current.error) throw new Error(current.error.message);
     if (!current.data) return null;
 
-    const next = (current.data[column] ?? 0) + 1;
+    const patch = { [column]: (current.data[column] ?? 0) + 1 } as {
+      fish_common?: number;
+      fish_rare?: number;
+      fish_epic?: number;
+      fish_legendary?: number;
+      fish_mythic?: number;
+    };
     const updated = await supabaseAdmin
       .from("profiles")
-      .update({ [column]: next })
+      .update(patch)
       .eq("wallet_address", wallet)
       .select("*")
       .single();
     if (updated.error) throw new Error(updated.error.message);
     return updated.data;
   });
+
