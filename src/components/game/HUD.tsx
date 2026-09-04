@@ -27,6 +27,11 @@ export function HUD() {
   const bite = phase === "bite";
   const rarity = (last?.isMonster ? "mythic" : last?.rarity) as Rarity | undefined;
   const weatherKind = useWeather((s) => s.kind);
+  const hour = useDayNight((s) => s.hour);
+  const auto = useDayNight((s) => s.auto);
+  const dayLabel = dayLabelFor(hour);
+  const DayIcon = DAY_ICON[dayLabel];
+
 
 
   return (
