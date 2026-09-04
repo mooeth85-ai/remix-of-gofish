@@ -98,6 +98,7 @@ export function GameCanvas() {
         gl={{ antialias: true }}
       >
         <Weather />
+        <WeatherCycleController />
 
         <Environment>
           <Lightformer intensity={1.6} position={[0, 12, 0]} scale={[24, 24, 1]} color="#ffffff" />
