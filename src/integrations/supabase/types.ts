@@ -108,6 +108,11 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           display_name: string
+          fish_common: number
+          fish_epic: number
+          fish_legendary: number
+          fish_mythic: number
+          fish_rare: number
           level: number
           updated_at: string
           username: string
@@ -117,6 +122,11 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string
+          fish_common?: number
+          fish_epic?: number
+          fish_legendary?: number
+          fish_mythic?: number
+          fish_rare?: number
           level?: number
           updated_at?: string
           username: string
@@ -126,6 +136,11 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string
+          fish_common?: number
+          fish_epic?: number
+          fish_legendary?: number
+          fish_mythic?: number
+          fish_rare?: number
           level?: number
           updated_at?: string
           username?: string
