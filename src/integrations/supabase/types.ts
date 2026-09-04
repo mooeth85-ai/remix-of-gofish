@@ -193,6 +193,30 @@ export type Database = {
         }
         Relationships: []
       }
+      weather_cycle_config: {
+        Row: {
+          change_interval_seconds: number
+          created_at: string
+          id: string
+          updated_at: string
+          weights: Json
+        }
+        Insert: {
+          change_interval_seconds?: number
+          created_at?: string
+          id: string
+          updated_at?: string
+          weights?: Json
+        }
+        Update: {
+          change_interval_seconds?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          weights?: Json
+        }
+        Relationships: []
+      }
       weather_effects: {
         Row: {
           bite_window_seconds: number
