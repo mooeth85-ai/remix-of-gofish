@@ -54,7 +54,10 @@ function FollowTarget({
 export function GameCanvas() {
   const controls = useRef<OrbitControlsImpl>(null);
   const kind = useWeather((s) => s.kind);
-  const backdrop = WEATHER[kind].backdrop;
+  const hour = useDayNight((s) => s.hour);
+  const backdrop = new THREE.Color(WEATHER[kind].backdrop)
+    .lerp(dayNightAt(hour).tint, TINT_WEIGHT)
+    .getStyle();
   useFishData();
 
 
