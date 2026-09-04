@@ -14,7 +14,164 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bait_tiers: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          rarity_multiplier: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          name: string
+          rarity_multiplier?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          rarity_multiplier?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fish_species: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          is_monster: boolean
+          max_weight_kg: number
+          min_weight_kg: number
+          name: string
+          rarity: string | null
+          updated_at: string
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          id: string
+          is_monster?: boolean
+          max_weight_kg: number
+          min_weight_kg: number
+          name: string
+          rarity?: string | null
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          is_monster?: boolean
+          max_weight_kg?: number
+          min_weight_kg?: number
+          name?: string
+          rarity?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fish_species_rarity_fkey"
+            columns: ["rarity"]
+            isOneToOne: false
+            referencedRelation: "rarity_base_weights"
+            referencedColumns: ["rarity"]
+          },
+        ]
+      }
+      game_config: {
+        Row: {
+          created_at: string
+          key: string
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          key: string
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          key?: string
+          updated_at?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      rarity_base_weights: {
+        Row: {
+          base_weight: number
+          created_at: string
+          rarity: string
+          updated_at: string
+        }
+        Insert: {
+          base_weight: number
+          created_at?: string
+          rarity: string
+          updated_at?: string
+        }
+        Update: {
+          base_weight?: number
+          created_at?: string
+          rarity?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      rod_tiers: {
+        Row: {
+          created_at: string
+          id: string
+          max_catch_weight_kg: number
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          max_catch_weight_kg: number
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          max_catch_weight_kg?: number
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      weather_effects: {
+        Row: {
+          bite_window_seconds: number
+          created_at: string
+          rarity_multiplier: Json
+          updated_at: string
+          weather_kind: string
+        }
+        Insert: {
+          bite_window_seconds: number
+          created_at?: string
+          rarity_multiplier?: Json
+          updated_at?: string
+          weather_kind: string
+        }
+        Update: {
+          bite_window_seconds?: number
+          created_at?: string
+          rarity_multiplier?: Json
+          updated_at?: string
+          weather_kind?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
