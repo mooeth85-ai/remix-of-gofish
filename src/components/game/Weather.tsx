@@ -221,6 +221,7 @@ function Atmosphere({ flash }: { flash: React.MutableRefObject<number> }) {
   const state = useRef<WeatherPreset>({ ...WEATHER.cerah });
   const fogColor = useMemo(() => new THREE.Color(WEATHER.cerah.fogColor), []);
   const sunColor = useMemo(() => new THREE.Color(WEATHER.cerah.sunColor), []);
+  const dayTint = useMemo(() => new THREE.Color("#ffffff"), []);
 
   useFrame((_, raw) => {
     const dt = Math.min(raw, 0.05);
