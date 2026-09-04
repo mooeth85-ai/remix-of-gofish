@@ -16,6 +16,7 @@ export function HUD() {
   const { phase, message, score, totalWeight, last } = useGameStore();
   const bite = phase === "bite";
   const rarity = (last?.isMonster ? "mythic" : last?.rarity) as Rarity | undefined;
+  const weatherKind = useWeather((s) => s.kind);
 
 
   return (
@@ -68,6 +69,27 @@ export function HUD() {
           WASD = move · SPACE = jump · ENTER / left click = cast &amp; reel · E = board/leave boat · R = stow/draw rod · right click = rotate
           camera · scroll = zoom
         </p>
+      </div>
+
+      {/* Dev weather switcher — temporary until the automatic day/weather cycle lands */}
+      <div className="pointer-events-auto absolute bottom-4 left-4 flex flex-col gap-1 rounded-2xl border border-white/25 bg-slate-900/45 p-2 shadow-lg backdrop-blur-md">
+        <p className="px-1 text-[10px] uppercase tracking-widest text-slate-300/80">Weather (dev)</p>
+        <div className="flex gap-1">
+          {WEATHER_KINDS.map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => useWeather.getState().setKind(k)}
+              className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold transition-colors ${
+                weatherKind === k
+                  ? "border-sky-300/70 bg-sky-500/30 text-sky-100"
+                  : "border-white/20 bg-slate-800/40 text-slate-300 hover:bg-slate-700/50"
+              }`}
+            >
+              {WEATHER[k].label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
