@@ -255,18 +255,27 @@ function Atmosphere({ flash }: { flash: React.MutableRefObject<number> }) {
     flash.current = Math.max(0, flash.current - dt * 3.2);
     const f = flash.current * flash.current;
 
+    // Day cycle sits on top: brightness scales the weather lighting and the
+    // tint blends over the weather colours without owning any preset field.
+    const day = dayNightAt(clock.hour, dayTint);
+    const b = day.brightness;
+
     const fog = scene.fog as THREE.FogExp2 | null;
     if (fog) {
       fog.density = s.fogDensity;
-      fog.color.copy(fogColor).lerp(new THREE.Color("#ffffff"), f * 0.6);
+      fog.color
+        .copy(fogColor)
+        .lerp(day.tint, TINT_WEIGHT)
+        .lerp(new THREE.Color("#ffffff"), f * 0.6);
     }
-    if (ambient.current) ambient.current.intensity = s.ambient + f * 1.4;
-    if (hemi.current) hemi.current.intensity = s.hemi;
+    if (ambient.current) ambient.current.intensity = s.ambient * b + f * 1.4;
+    if (hemi.current) hemi.current.intensity = s.hemi * b;
     if (sun.current) {
-      sun.current.intensity = s.sun + f * 0.8;
-      sun.current.color.copy(sunColor);
+      sun.current.intensity = s.sun * b + f * 0.8;
+      sun.current.color.copy(sunColor).lerp(day.tint, TINT_WEIGHT);
     }
     if (bolt.current) bolt.current.intensity = f * 900;
+
 
     const m = sky.current?.material as THREE.ShaderMaterial | undefined;
     if (m?.uniforms) {
