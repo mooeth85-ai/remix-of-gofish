@@ -61,12 +61,16 @@ interface DayNightStore {
   setAuto: (auto: boolean) => void;
 }
 
+/** Frame-precise clock. The store mirrors it in coarse steps so HUD
+ *  subscribers don't re-render every frame. */
+export const clock = { hour: 7 };
+
 export const useDayNight = create<DayNightStore>((set, get) => ({
   hour: 7,
   auto: true,
   advance: (dt) => {
-    const next = (get().hour + (dt / dayLengthSeconds()) * 24) % 24;
-    set({ hour: next });
+    clock.hour = (clock.hour + (dt / dayLengthSeconds()) * 24) % 24;
+    if (Math.abs(clock.hour - get().hour) > 0.05) set({ hour: clock.hour });
   },
   setAuto: (auto) => set({ auto }),
 }));
