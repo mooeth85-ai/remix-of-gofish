@@ -14,7 +14,9 @@ import { HUD } from "./HUD";
 import { LoadingScreen } from "./LoadingScreen";
 import { Weather } from "./Weather";
 import { RainImpacts } from "./RainImpacts";
+import { WeatherCycleController } from "./WeatherCycleController";
 import { WEATHER, useWeather } from "@/hooks/useWeather";
+import { useDayNight, dayNightAt, TINT_WEIGHT } from "@/hooks/useDayNight";
 import { useFishData } from "@/hooks/useFishData";
 
 import { player } from "@/hooks/usePlayer";
@@ -52,7 +54,10 @@ function FollowTarget({
 export function GameCanvas() {
   const controls = useRef<OrbitControlsImpl>(null);
   const kind = useWeather((s) => s.kind);
-  const backdrop = WEATHER[kind].backdrop;
+  const hour = useDayNight((s) => s.hour);
+  const backdrop = new THREE.Color(WEATHER[kind].backdrop)
+    .lerp(dayNightAt(hour).tint, TINT_WEIGHT)
+    .getStyle();
   useFishData();
 
 
@@ -93,6 +98,7 @@ export function GameCanvas() {
         gl={{ antialias: true }}
       >
         <Weather />
+        <WeatherCycleController />
 
         <Environment>
           <Lightformer intensity={1.6} position={[0, 12, 0]} scale={[24, 24, 1]} color="#ffffff" />

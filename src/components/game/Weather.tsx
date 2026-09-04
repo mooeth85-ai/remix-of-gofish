@@ -3,6 +3,7 @@ import { Sky } from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { WEATHER, useWeather, type WeatherPreset } from "@/hooks/useWeather";
+import { clock, dayNightAt, TINT_WEIGHT } from "@/hooks/useDayNight";
 import { playThunder, setWeatherAmbience, setWeatherLevels } from "@/lib/weatherAudio";
 
 const damp = (cur: number, to: number, k: number, dt: number) =>
@@ -220,6 +221,7 @@ function Atmosphere({ flash }: { flash: React.MutableRefObject<number> }) {
   const state = useRef<WeatherPreset>({ ...WEATHER.cerah });
   const fogColor = useMemo(() => new THREE.Color(WEATHER.cerah.fogColor), []);
   const sunColor = useMemo(() => new THREE.Color(WEATHER.cerah.sunColor), []);
+  const dayTint = useMemo(() => new THREE.Color("#ffffff"), []);
 
   useFrame((_, raw) => {
     const dt = Math.min(raw, 0.05);
@@ -254,18 +256,27 @@ function Atmosphere({ flash }: { flash: React.MutableRefObject<number> }) {
     flash.current = Math.max(0, flash.current - dt * 3.2);
     const f = flash.current * flash.current;
 
+    // Day cycle sits on top: brightness scales the weather lighting and the
+    // tint blends over the weather colours without owning any preset field.
+    const day = dayNightAt(clock.hour, dayTint);
+    const b = day.brightness;
+
     const fog = scene.fog as THREE.FogExp2 | null;
     if (fog) {
       fog.density = s.fogDensity;
-      fog.color.copy(fogColor).lerp(new THREE.Color("#ffffff"), f * 0.6);
+      fog.color
+        .copy(fogColor)
+        .lerp(day.tint, TINT_WEIGHT)
+        .lerp(new THREE.Color("#ffffff"), f * 0.6);
     }
-    if (ambient.current) ambient.current.intensity = s.ambient + f * 1.4;
-    if (hemi.current) hemi.current.intensity = s.hemi;
+    if (ambient.current) ambient.current.intensity = s.ambient * b + f * 1.4;
+    if (hemi.current) hemi.current.intensity = s.hemi * b;
     if (sun.current) {
-      sun.current.intensity = s.sun + f * 0.8;
-      sun.current.color.copy(sunColor);
+      sun.current.intensity = s.sun * b + f * 0.8;
+      sun.current.color.copy(sunColor).lerp(day.tint, TINT_WEIGHT);
     }
     if (bolt.current) bolt.current.intensity = f * 900;
+
 
     const m = sky.current?.material as THREE.ShaderMaterial | undefined;
     if (m?.uniforms) {
