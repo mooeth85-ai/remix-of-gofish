@@ -138,6 +138,9 @@ export const uploadAvatar = createServerFn({ method: "POST" })
 const recordCatchSchema = z.object({
   proof: proofSchema,
   rarity: z.enum(["common", "rare", "epic", "legendary", "mythic"]),
+  speciesId: z.string().min(1).max(60),
+  weightKg: z.number().positive().max(100000),
+  mutationKey: z.string().min(1).max(40),
 });
 
 /** Increments the fish_{rarity} counter on the caller's profile. */
@@ -147,13 +150,56 @@ export const recordCatch = createServerFn({ method: "POST" })
     const wallet = await verifyProof(data.proof);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Atomic increment handled by the increment_fish_catch Postgres function
-    // (single UPDATE ... SET col = col + 1, no read-modify-write race).
-    const updated = await supabaseAdmin.rpc("increment_fish_catch", {
+    // record_catch inserts the inventory row and increments fish_{rarity}
+    // atomically in one server-side statement pair.
+    const updated = await supabaseAdmin.rpc("record_catch", {
       _wallet: wallet,
       _rarity: data.rarity,
+      _species_id: data.speciesId,
+      _weight_kg: data.weightKg,
+      _mutation_key: data.mutationKey,
     });
     if (updated.error) throw new Error(updated.error.message);
     return updated.data;
   });
 
+/** Returns the caller's unsold fish, newest first. */
+export const getInventory = createServerFn({ method: "POST" })
+  .validator((input: unknown) => proofSchema.parse(input))
+  .handler(async ({ data }) => {
+    const wallet = await verifyProof(data);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const res = await supabaseAdmin
+      .from("fish_inventory_items")
+      .select("id, species_id, weight_kg, mutation_key, caught_at")
+      .eq("wallet_address", wallet)
+      .order("caught_at", { ascending: false })
+      .limit(500);
+    if (res.error) throw new Error(res.error.message);
+    return (res.data ?? []).map((r) => ({ ...r, weight_kg: Number(r.weight_kg) }));
+  });
+
+const sellSchema = z.object({
+  proof: proofSchema,
+  itemId: z.string().uuid().nullable().optional(),
+  speciesId: z.string().min(1).max(60).nullable().optional(),
+  sellAll: z.boolean().optional(),
+});
+
+/** Sells one fish, every fish of a species, or the whole bucket. */
+export const sellFish = createServerFn({ method: "POST" })
+  .validator((input: unknown) => sellSchema.parse(input))
+  .handler(async ({ data }) => {
+    const wallet = await verifyProof(data.proof);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // The generated arg types are non-nullable, but the SQL function treats
+    // NULL as "not filtering by this key".
+    const res = await supabaseAdmin.rpc("sell_fish", {
+      _wallet: wallet,
+      _item_id: (data.itemId ?? null) as string,
+      _species_id: (data.speciesId ?? null) as string,
+      _sell_all: data.sellAll ?? false,
+    });
+    if (res.error) throw new Error(res.error.message);
+    return res.data;
+  });

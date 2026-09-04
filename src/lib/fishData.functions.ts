@@ -3,6 +3,7 @@ import type {
   BaitTier,
   FishData,
   FishSpecies,
+  Mutation,
   RodTier,
   WeatherCycleConfig,
   WeatherEffect,
@@ -28,8 +29,10 @@ export const getFishData = createServerFn({ method: "GET" }).handler(async (): P
     },
   });
 
-  const [species, rarity, rods, baits, weather, config, cycle] = await Promise.all([
-    supabase.from("fish_species").select("id, name, color, rarity, min_weight_kg, max_weight_kg, is_monster"),
+  const [species, rarity, rods, baits, weather, config, cycle, mutations] = await Promise.all([
+    supabase
+      .from("fish_species")
+      .select("id, name, color, rarity, min_weight_kg, max_weight_kg, is_monster, base_price_per_kg"),
     supabase.from("rarity_base_weights").select("rarity, base_weight"),
     supabase.from("rod_tiers").select("id, name, max_catch_weight_kg"),
     supabase.from("bait_tiers").select("id, name, rarity_multiplier"),
@@ -40,9 +43,10 @@ export const getFishData = createServerFn({ method: "GET" }).handler(async (): P
       .select("change_interval_seconds, weights")
       .eq("id", "default")
       .maybeSingle(),
+    supabase.from("mutations").select("key, label, multiplier, drop_weight"),
   ]);
 
-  const firstError = [species, rarity, rods, baits, weather, config, cycle].find((r) => r.error)?.error;
+  const firstError = [species, rarity, rods, baits, weather, config, cycle, mutations].find((r) => r.error)?.error;
   if (firstError) throw new Error(firstError.message);
 
   const rarityWeights: Record<string, number> = {};
@@ -69,6 +73,7 @@ export const getFishData = createServerFn({ method: "GET" }).handler(async (): P
       ...s,
       min_weight_kg: Number(s.min_weight_kg),
       max_weight_kg: Number(s.max_weight_kg),
+      base_price_per_kg: Number(s.base_price_per_kg),
     })),
     rarityWeights,
     rods: ((rods.data ?? []) as RodTier[]).map((r) => ({
@@ -89,5 +94,10 @@ export const getFishData = createServerFn({ method: "GET" }).handler(async (): P
         ((cycle.data as WeatherCycleConfig | null)?.weights as Record<string, number> | undefined) ??
         { cerah: 40, berawan: 25, berkabut: 15, hujan: 12, badai: 8 },
     },
+    mutations: ((mutations.data ?? []) as Mutation[]).map((m) => ({
+      ...m,
+      multiplier: Number(m.multiplier),
+      drop_weight: Number(m.drop_weight),
+    })),
   };
 });

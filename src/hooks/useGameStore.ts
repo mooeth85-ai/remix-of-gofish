@@ -4,6 +4,7 @@ import {
   ACTIVE_ROD_TIER,
   getFishData,
   mult,
+  rollMutation,
   type FishSpecies,
   type Rarity,
 } from "@/lib/fishRules";
@@ -11,7 +12,10 @@ import {
 export type Phase = "idle" | "cast" | "waiting" | "bite" | "reel" | "caught";
 
 export interface FishCatch {
+  speciesId: string;
   name: string;
+  mutationKey: string;
+  mutationLabel: string;
   weight: number;
   color: string;
   rarity?: Rarity | null;
@@ -23,8 +27,12 @@ function rollWeight(s: FishSpecies) {
 }
 
 function toCatch(s: FishSpecies): FishCatch {
+  const m = rollMutation();
   return {
+    speciesId: s.id,
     name: s.name,
+    mutationKey: m.key,
+    mutationLabel: m.label,
     color: s.color,
     weight: rollWeight(s),
     rarity: s.rarity,
@@ -81,7 +89,15 @@ function syncCatchToProfile(f: FishCatch) {
       const proof = useProfileStore.getState().proof;
       if (!proof) return;
       const { recordCatch } = await import("@/lib/profile.functions");
-      const profile = await recordCatch({ data: { proof, rarity } });
+      const profile = await recordCatch({
+        data: {
+          proof,
+          rarity,
+          speciesId: f.speciesId,
+          weightKg: f.weight,
+          mutationKey: f.mutationKey,
+        },
+      });
       if (profile) useProfileStore.getState().setProfile(profile);
     } catch {
       /* offline or not signed in — gameplay continues regardless */
