@@ -4,7 +4,7 @@ export const SIGNATURE_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 export function buildAuthMessage(address: string, issuedAt: string) {
   return [
-    "Koleo Island — profile authentication",
+    "Fishing Island — profile authentication",
     `Wallet: ${address.toLowerCase()}`,
     `Issued at: ${issuedAt}`,
     "",
