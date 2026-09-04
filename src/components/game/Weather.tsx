@@ -284,8 +284,14 @@ function Atmosphere({ flash }: { flash: React.MutableRefObject<number> }) {
       (m.uniforms["rayleigh"]!.value as number) = s.rayleigh;
       (m.uniforms["mieCoefficient"]!.value as number) = s.mieCoefficient;
       // 1.0 is identity, so overcast/storm skies keep their natural gray.
+      s.skySaturation = damp(s.skySaturation, target.skySaturation, k, dt);
       const sat = m.uniforms["uSaturation"];
-      if (sat) (sat.value as number) = damp(sat.value as number, target.skySaturation, k, dt);
+      if (sat) (sat.value as number) = s.skySaturation * b;
+      // The dome itself is the night sky, so the tint applies at full weight.
+      const nightMix = m.uniforms["uNightMix"];
+      if (nightMix) (nightMix.value as number) = 1 - b;
+      const nightColor = m.uniforms["uNightColor"];
+      if (nightColor) (nightColor.value as THREE.Color).copy(day.tint);
     }
   });
 
@@ -298,14 +304,17 @@ function Atmosphere({ flash }: { flash: React.MutableRefObject<number> }) {
     m.uniforms = {
       ...m.uniforms,
       uSaturation: { value: 2.1 },
+      uNightMix: { value: 0 },
+      uNightColor: { value: new THREE.Color("#1d2c5c") },
     };
     m.fragmentShader =
-      "uniform float uSaturation;\n" +
+      "uniform float uSaturation;\nuniform float uNightMix;\nuniform vec3 uNightColor;\n" +
       m.fragmentShader.replace(
         "#include <colorspace_fragment>",
         /* glsl */ `
         float lum = dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114));
         gl_FragColor.rgb = max(mix(vec3(lum), gl_FragColor.rgb, uSaturation), 0.0);
+        gl_FragColor.rgb = mix(gl_FragColor.rgb, uNightColor, clamp(uNightMix, 0.0, 1.0));
         #include <colorspace_fragment>
       `,
       );

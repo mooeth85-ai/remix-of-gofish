@@ -55,10 +55,7 @@ export function dayLabelFor(hour: number): DayLabel {
 
 interface DayNightStore {
   hour: number;
-  /** Automatic weather cycling. Manual weather picks turn this off. */
-  auto: boolean;
   advance: (dt: number) => void;
-  setAuto: (auto: boolean) => void;
 }
 
 /** Frame-precise clock. The store mirrors it in coarse steps so HUD
@@ -67,10 +64,8 @@ export const clock = { hour: 7 };
 
 export const useDayNight = create<DayNightStore>((set, get) => ({
   hour: 7,
-  auto: true,
   advance: (dt) => {
     clock.hour = (clock.hour + (dt / dayLengthSeconds()) * 24) % 24;
     if (Math.abs(clock.hour - get().hour) > 0.05) set({ hour: clock.hour });
   },
-  setAuto: (auto) => set({ auto }),
 }));

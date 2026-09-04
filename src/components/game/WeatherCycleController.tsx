@@ -22,23 +22,17 @@ function pickWeather(weights: Record<string, number>): WeatherKind {
  *  Renders nothing. */
 export function WeatherCycleController() {
   const elapsed = useRef(0);
-  const wasAuto = useRef(true);
 
   useFrame((_, raw) => {
     const dt = Math.min(raw, 0.05);
-    const { advance, auto } = useDayNight.getState();
-    advance(dt);
-
-    // Returning to Auto restarts the interval so it never snaps mid-cycle.
-    if (auto && !wasAuto.current) elapsed.current = 0;
-    wasAuto.current = auto;
+    useDayNight.getState().advance(dt);
 
     const cycle = getFishData().weatherCycle;
     const interval = cycle.change_interval_seconds > 0 ? cycle.change_interval_seconds : 240;
     elapsed.current += dt;
     if (elapsed.current < interval) return;
     elapsed.current = 0;
-    if (auto) useWeather.getState().setKind(pickWeather(cycle.weights));
+    useWeather.getState().setKind(pickWeather(cycle.weights));
   });
 
   return null;
