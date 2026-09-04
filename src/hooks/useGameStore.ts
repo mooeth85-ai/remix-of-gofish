@@ -69,10 +69,28 @@ export function rollFish(weatherKind = "cerah"): FishCatch {
     }
   }
 
-  const chosen = pick;
-  const weight = Math.min(rollWeight(chosen), cap === Infinity ? Number.POSITIVE_INFINITY : Math.max(cap, chosen.min_weight_kg));
-  return { ...toCatch(chosen), weight: Number(weight.toFixed(2)) };
+  return toCatch(pick);
 }
+
+/** Fire-and-forget profile counter sync. Never blocks or breaks gameplay. */
+function syncCatchToProfile(f: FishCatch) {
+  const rarity: Rarity = f.isMonster ? "mythic" : ((f.rarity ?? "common") as Rarity);
+  void (async () => {
+    try {
+      const { useProfileStore } = await import("@/hooks/useProfileStore");
+      const proof = useProfileStore.getState().proof;
+      if (!proof) return;
+      const { recordCatch } = await import("@/lib/profile.functions");
+      const profile = await recordCatch({ data: { proof, rarity } });
+      if (profile) useProfileStore.getState().setProfile(profile);
+    } catch {
+      /* offline or not signed in — gameplay continues regardless */
+    }
+  })();
+}
+
+
+
 
 
 interface GameStore {
@@ -101,10 +119,13 @@ export const useGameStore = create<GameStore>((set) => ({
   setMessage: (message) => set({ message }),
   setRodStowed: (rodStowed) => set({ rodStowed }),
   toggleRodStowed: () => set((s) => ({ rodStowed: !s.rodStowed })),
-  landFish: (f) =>
+  landFish: (f) => {
+    syncCatchToProfile(f);
     set((s) => ({
       score: s.score + 1,
       totalWeight: Number((s.totalWeight + f.weight).toFixed(2)),
       last: f,
-    })),
+    }));
+  },
 }));
+

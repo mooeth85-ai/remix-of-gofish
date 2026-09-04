@@ -8,6 +8,9 @@ import { MonsterBurstMesh, animateBurst } from "./MonsterBurst";
 import { rollFish, useGameStore, type FishCatch } from "@/hooks/useGameStore";
 import { clampToWalkable, isInWater, player, resolvePlayerGround } from "@/hooks/usePlayer";
 import { boat } from "@/hooks/useBoat";
+import { useWeather } from "@/hooks/useWeather";
+import { biteWindowFor } from "@/lib/fishRules";
+
 import {
   playBobberSplash,
   playCastWhizz,
@@ -471,7 +474,7 @@ export function Angler() {
       if (st.t > st.biteAt) {
         st.phase = "bite";
         st.t = 0;
-        st.fish = rollFish();
+        st.fish = rollFish(useWeather.getState().kind);
         setPhase("bite");
         setMessage("FISH ON! Press SPACE / ENTER now!");
       }
@@ -488,7 +491,7 @@ export function Angler() {
       armL = -1.2;
       armLZ = -0.55;
 
-      if (st.t > 1.6) {
+      if (st.t > biteWindowFor(useWeather.getState().kind)) {
         st.phase = "idle";
         st.t = 0;
         st.fish = null;
